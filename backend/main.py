@@ -8,19 +8,18 @@ import os
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+
 load_dotenv()
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Update this to restrict origins if needed
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],  # Update this to restrict headers if needed
+    allow_headers=["*"],  
 )
 
-# Access API key from environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 class POST_DATA(BaseModel):
@@ -34,11 +33,11 @@ async def extract_summary(data: POST_DATA):
         download_path = './download/'
         download_youtube_video(data.url, download_path)
 
-        # Extract audio from the video
+        # Extracting audio from the video
         video_path = find_first_mp4(download_path)
         extract_audio_from_video(video_path, audio_path)
 
-        # Convert audio to text using Whisper ASR API
+        # Converting audio to text using Whisper model
         text = audio_to_text_whisper(audio_path)
 
         # Summarize text using OpenAI ChatGPT

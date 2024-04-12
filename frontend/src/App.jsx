@@ -23,16 +23,17 @@ function App() {
   };
 
   return (
-    <div>
-      <h2>Generate summary here</h2>
+    <div className="container mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4">Generate summary here</h2>
       <input
         type="text"
+        className="w-full border border-gray-300 rounded-md px-4 py-2 mb-4"
         placeholder="Enter YouTube video link"
         value={inputUrl}
         onChange={handleInputChange}
       />
-      <button onClick={handleExtractClick}>Extract Summary</button>
-      {summary && <p>{summary}</p>}
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleExtractClick}>Extract Summary</button>
+      {summary && <p className="mt-4">{summary}</p>}
     </div>
   );
 }

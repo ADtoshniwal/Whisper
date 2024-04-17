@@ -4,12 +4,14 @@ import axios from 'axios';
 function App() {
   const [inputUrl, setInputUrl] = useState('');
   const [summary, setSummary] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Added state for loading
 
   const handleInputChange = (event) => {
     setInputUrl(event.target.value);
   };
 
   const handleExtractClick = async () => {
+    setIsLoading(true); // Set loading to true before API call
     try {
       const response = await axios.post('http://127.0.0.1:8000/extract', { url: inputUrl }, {
         headers: {
@@ -19,6 +21,8 @@ function App() {
       setSummary(response.data.summary);
     } catch (error) {
       console.error('Error:', error);
+    } finally {
+      setIsLoading(false); // Set loading to false after API call (success or error)
     }
   };
 
@@ -32,8 +36,16 @@ function App() {
         value={inputUrl}
         onChange={handleInputChange}
       />
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleExtractClick}>Extract Summary</button>
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleExtractClick} disabled={isLoading}>
+        {isLoading ? 'Loading...' : 'Extract Summary'}
+      </button>
       {summary && <p className="mt-4">{summary}</p>}
+      {isLoading && (
+        <div className="mt-4">
+          {/* Add your loading animation component here */}
+          <p>Fetching summary...</p>  {/* Example placeholder */}
+        </div>
+      )}
     </div>
   );
 }

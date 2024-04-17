@@ -14,10 +14,10 @@ load_dotenv()
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],  
+    allow_headers=["*"],
 )
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -31,6 +31,10 @@ async def extract_summary(data: POST_DATA):
         # Download YouTube video
         audio_path = './download/audio.mp3'
         download_path = './download/'
+
+        # Clear download folder before download
+        clear_download_folder(download_path)
+
         download_youtube_video(data.url, download_path)
 
         # Extracting audio from the video
@@ -40,12 +44,23 @@ async def extract_summary(data: POST_DATA):
         # Converting audio to text using Whisper model
         text = audio_to_text_whisper(audio_path)
 
-        # Summarize text using OpenAI ChatGPT
+        # Summarize text using ChatGPT
         summary = summarize_text_chatgpt(text)
 
         return {"summary": summary}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+def clear_download_folder(folder_path):
+  """
+  This function removes all files from the download folder.
+  """
+  for filename in os.listdir(folder_path):
+    file_path = os.path.join(folder_path, filename)
+    try:
+      os.remove(file_path)
+    except OSError:
+      pass  # Ignore errors if file is already deleted or inaccessible
 
 def download_youtube_video(url, output_path):
     yt = YouTube(url)
@@ -108,7 +123,3 @@ def summarize_text_chatgpt(text):
 
     summary = response['choices'][0]['message']['content']
     return summary
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
